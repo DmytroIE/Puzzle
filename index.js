@@ -16,37 +16,49 @@ class Puzzle {
     //this.hole = {left: '', top: ''}; // объект - пустая ячейка
     //this.hole.index = divider * divider - 1; // индексом для hole поначалу является последняя ячейка, ячейки нумеруем с нуля
     //  создаем поле из клеточек
-    const width = Number.parseInt(node.style.width) / divider;
-    const height = Number.parseInt(node.style.height) / divider;
+    this.itemWidth = Number.parseInt(node.style.width) / divider;
+    this.itemHeight = Number.parseInt(node.style.height) / divider;
 
     node.style.position = 'relative'; // на всякий случай
     node.style.backgroundColor = '#555'; //
 
     for (let i = 0; i < divider * divider - 1; i++) {
+
+      // вначале создаем DOM-элемент
       const cell = document.createElement('div');
+
+      // потом создаем его двойника, который будет участвовать в вычислительном цикле 
+      this.items[i] = {
+        left: (i % divider) * this.itemWidth, 
+        top: Math.trunc(i / divider) * this.itemHeight, 
+        index: i, 
+        link: cell
+      };
+
+
+      // теперь заполняем DOM-элемент
       cell.style.position = 'absolute';
       cell.style.boxSizing = 'border-box';
-      cell.style.width = width + 'px';
-      cell.style.height = height + 'px';
+      cell.style.width = this.itemWidth + 'px';
+      cell.style.height = this.itemHeight + 'px';
       cell.style.border = '1px solid black';
       cell.style.backgroundImage = `url(${picturePath})`;
 
       cell.style.backgroundPositionX = `${(i % divider)/(divider - 1) * 100}%`; // найти ошибку
       cell.style.backgroundPositionY = `${Math.trunc(i / divider)/(divider - 1) * 100}%`; // найти ошибку
 
-      cell.style.left = `${(i % divider) * width}px`;
-      cell.style.top = `${Math.trunc(i / divider) * height}px`;
+      cell.style.left = `${this.items[i].left}px`;
+      cell.style.top = `${this.items[i].top}px`;
 
 
       node.appendChild(cell);
-      // заодно добавим инфо о положении ячейки в наш массив
-      this.items[i] = {left: (i % divider) * width, top: Math.trunc(i / divider) * height, /*index: i,*/ link: cell}; // в параллельном массиве храним все в виде чисел
+      
     }
     // в последнюю ячейку массива записываем hole, похожий на остальные узлы
     // добавим к объекту массива переменную, которая показывает, где искать hole
     this.items.holeIndex = divider * divider - 1;
     // ти записываем hole в таком же формате, как и остальные узлы (дляудобства работы)
-    this.items[this.items.holeIndex] = {left: (this.items.holeIndex % divider) * width, top: Math.trunc(this.items.holeIndex / divider) * height, /*index: this.items.holeIndex*/};
+    this.items[this.items.holeIndex] = {left: (this.items.holeIndex % divider) * this.itemWidth, top: Math.trunc(this.items.holeIndex / divider) * this.itemHeight, index: this.items.holeIndex};
 
     //debugger
 
@@ -149,6 +161,29 @@ class Puzzle {
       this.isProcessRun = false;
       //alert('Turned off');
     }
+
+  }
+
+  reset() {
+
+
+    this.items.sort((a, b) =>  a.index - b.index);
+    for (let i = 0; i < this.items.length-1; i++) {
+      
+      this.items[i].left = (i % this.divider) * this.itemWidth;
+      this.items[i].top = Math.trunc(i / this.divider) * this.itemHeight;
+      
+      this.items[i].link.style.left = `${this.items[i].left}px`;
+      this.items[i].link.style.top = `${this.items[i].top}px`;
+
+
+    }
+
+    //debugger
+    this.items.holeIndex = this.items.length-1;
+ 
+    this.items[this.items.holeIndex].left = (this.items.holeIndex % this.divider) * this.itemWidth;
+    this.items[this.items.holeIndex].top = Math.trunc(this.items.holeIndex / this.divider) * this.itemHeight;
 
   }
 }

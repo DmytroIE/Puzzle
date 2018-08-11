@@ -42,7 +42,10 @@
     strategy = new StrategyArbitrarily();
     puzzle = new Puzzle(container, "https://i.pinimg.com/originals/ed/e6/b6/ede6b61499b1bbdb75f468469fe1758f.jpg", 6, strategy);
     //debugger
-
+    const resetBtn = document.querySelector('#reset');
+    resetBtn.addEventListener('click', () => {
+      puzzle.reset();
+    });
 
     const startBtn = document.querySelector('#start');
     startBtn.addEventListener('click', () => {
