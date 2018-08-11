@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Puzzle</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div id = "container" style = "width: 414px; height: 427px;">
+
+  </div>
+
+  <button id = "start" style = "width: 100px; min-height: 40px; font-size: 20px;">
+    Start!
+  </button>
+  <button id = "reset" style = "width: 100px; min-height: 40px; font-size: 20px;">
+    Reset
+  </button>
+
+  <!-- <div id = "container2" >
+    <img src="https://i.pinimg.com/originals/ed/e6/b6/ede6b61499b1bbdb75f468469fe1758f.jpg" width = "414" height = "427" alt="" style = " display: block;">
+  </div> -->
+  
+  <!-- <div class="container3">
+    <div class="part11"></div>
+    <div class="part12"></div>
+    <div class="part13"></div>
+    <div class="part21"></div>
+    <div class="part22"></div>
+    <div class="part23"></div>
+    <div class="part31"></div>
+    <div class="part32"></div>
+    <div class="part33"></div>
+
+  </div> -->
+
+  <script src="index.js"></script>
+
+  <script>
+    strategy = new StrategyArbitrarily();
+    puzzle = new Puzzle(container, "https://i.pinimg.com/originals/ed/e6/b6/ede6b61499b1bbdb75f468469fe1758f.jpg", 6, strategy);
+    //debugger
+
+
+    const startBtn = document.querySelector('#start');
+    startBtn.addEventListener('click', () => {
+      puzzle.puzzleIt(3);
+      btnText = startBtn.textContent.trim(); 
+      if (btnText === 'Start!') {
+        startBtn.textContent = 'Stop';
+      }
+      else {
+        startBtn.textContent = 'Start!';
+      }
+    });
+    
+  </script>
+  
+</body>
+</html>

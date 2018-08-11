@@ -1,0 +1,51 @@
+.container3 {
+  display: flex;
+  flex-wrap: wrap;
+  width: 414px;
+}
+
+
+div[class^="part"]{
+  width: 138px;
+  height: 142.3333333px;
+  background-image: url("https://i.pinimg.com/originals/ed/e6/b6/ede6b61499b1bbdb75f468469fe1758f.jpg");
+  box-sizing: border-box;
+  border: 20px solid blue;
+
+}
+
+.part11{
+  background-position: 0% 0%;
+}
+
+.part12{
+  background-position: 50% 0%;
+}
+
+.part13{
+  background-position: 100% 0%;
+}
+
+.part21{
+  background-position: 0% 50%;
+}
+
+.part22{
+  background-position: 50% 50%;
+}
+
+.part23{
+  background-position: 100% 50%;
+}
+
+.part31{
+  background-position: 0% 100%;
+}
+
+.part32{
+  background-position: 50% 100%;
+}
+
+.part33{
+  background-position: 100% 100%;
+}
