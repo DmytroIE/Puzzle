@@ -8,7 +8,8 @@ class Puzzle {
     this.divider = divider;
     this.strategy = strategy;
     // флаг того, что процесс уже запущен
-    this.isProcessRun = false;
+    this.isProcessRunning = false;
+    this.isShiftDone = true; // флаг, подтверждающий перемещение ячейки
     this.processTimer = 0;
     // массив ссылок на объекты, которые имеют связь с div'ами, в которых кусочки картинки
     this.items = [];
@@ -60,101 +61,113 @@ class Puzzle {
   }
 
   shiftCells(time) {
-    // вначале запускаем стратегию, которая выберет ячейку для перемещения
-    const newHoleIdx = this.strategy.shift(this.divider, this.items.holeIndex);
 
-    // Определяем направление движения
-    const direction =
-      newHoleIdx === this.items.holeIndex - 1 ||
-      newHoleIdx === this.items.holeIndex + 1
-        ? 'left'
-        : 'top';
+    if (this.isShiftDone === true) { // запускаем, если только пред. смещение полностью завершено
 
-    let distance =
-      this.items[this.items.holeIndex][direction] -
-      this.items[newHoleIdx][direction];
+      this.isShiftDone = false; // может быть, перенести в функцию в setInterval???????????????????????????????
+      // вначале запускаем стратегию, которая выберет ячейку для перемещения
+      const newHoleIdx = this.strategy.shift(this.divider, this.items.holeIndex);
 
-    // величина смещения ячейки за один прогон. По дефолту равна 1 пикселю
-    const pix = distance > 0 ? 1 : -1;
+      // Определяем направление движения
+      const direction =
+        newHoleIdx === this.items.holeIndex - 1 ||
+        newHoleIdx === this.items.holeIndex + 1
+          ? 'left'
+          : 'top';
 
-    // по distance будем вести обратный отсчет
-    distance = Math.abs(distance);
+      let distance =
+        this.items[this.items.holeIndex][direction] -
+        this.items[newHoleIdx][direction];
 
-    // теперь нужно выбрать интервал времени для перемещения на 1 пиксель.
-    // Он не должен быть больше time/distance, потому запас 20%
+      // величина смещения ячейки за один прогон. По дефолту равна 1 пикселю
+      const pix = distance > 0 ? 1 : -1;
 
-    const timeInterval = Math.trunc((time / distance) * 0.8 * Math.abs(pix));
+      // по distance будем вести обратный отсчет
+      distance = Math.abs(distance);
 
-    // еще некоторые приготовления
-    // запишем координаты ячейки во временные переменные, чтобы потом их использовать
-    const tempLeft = this.items[newHoleIdx].left;
-    const tempTop = this.items[newHoleIdx].top;
+      // теперь нужно выбрать интервал времени для перемещения на 1 пиксель.
+      // Он не должен быть больше time/distance, потому запас 20%
 
-    // теперь сама анимация
+      const timeInterval = Math.trunc((time / distance) * 0.8 * Math.abs(pix));
 
-    const timerId = setInterval(() => {
-      if (distance >= 1 && this.isProcessRun) {
-        this.items[newHoleIdx][direction] += pix;
-        this.items[newHoleIdx].link.style[direction] = this.items[newHoleIdx][direction] + 'px';
-        distance -= Math.abs(pix); // обратный отсчет
-      } else {
-        // если расстояние до новой позиции меньше 1 пкс, то просто задаем ей координаты hole
-        // (они-то и должны были в конце концов получиться)
-        this.items[newHoleIdx].left = this.items[this.items.holeIndex].left;
-        this.items[newHoleIdx].top = this.items[this.items.holeIndex].top;
+      // еще некоторые приготовления
+      // запишем координаты ячейки во временные переменные, чтобы потом их использовать
+      const tempLeft = this.items[newHoleIdx].left;
+      const tempTop = this.items[newHoleIdx].top;
 
-        this.items[newHoleIdx].link.style.left =
-          this.items[newHoleIdx].left + 'px';
-        this.items[newHoleIdx].link.style.top =
-          this.items[newHoleIdx].top + 'px';
+      // теперь сама анимация
 
-        // теперь меняем в массиве местами hole и ячейку, которую мы передвинули
-        // перекинем ссылку на hole во временную переменную
-        const tempLink = this.items[this.items.holeIndex];
+      const timerId = setInterval(() => {
+        if (distance >= 1 && this.isProcessRunning) {
+          this.items[newHoleIdx][direction] += pix;
+          this.items[newHoleIdx].link.style[direction] = this.items[newHoleIdx][direction] + 'px';
+          distance -= Math.abs(pix); // обратный отсчет
+        } else {
+          // если расстояние до новой позиции меньше 1 пкс, то просто задаем ей координаты hole
+          // (они-то и должны были в конце концов получиться)
+          this.items[newHoleIdx].left = this.items[this.items.holeIndex].left;
+          this.items[newHoleIdx].top = this.items[this.items.holeIndex].top;
 
-        // теперь на месте hole передвинутая ячейка
-        this.items[this.items.holeIndex] = this.items[newHoleIdx];
+          this.items[newHoleIdx].link.style.left =
+            this.items[newHoleIdx].left + 'px';
+          this.items[newHoleIdx].link.style.top =
+            this.items[newHoleIdx].top + 'px';
 
-        // а на место передвинутой ячейки записываем hole
-        this.items[newHoleIdx] = tempLink;
-        this.items[newHoleIdx].left = tempLeft;
-        this.items[newHoleIdx].top = tempTop;
-        this.items.holeIndex = newHoleIdx;
+          // теперь меняем в массиве местами hole и ячейку, которую мы передвинули
+          // перекинем ссылку на hole во временную переменную
+          const tempLink = this.items[this.items.holeIndex];
 
-        clearInterval(timerId);
-      }
-    }, timeInterval);
+          // теперь на месте hole передвинутая ячейка
+          this.items[this.items.holeIndex] = this.items[newHoleIdx];
+
+          // а на место передвинутой ячейки записываем hole
+          this.items[newHoleIdx] = tempLink;
+          this.items[newHoleIdx].left = tempLeft;
+          this.items[newHoleIdx].top = tempTop;
+          this.items.holeIndex = newHoleIdx;
+
+          this.isShiftDone = true;
+
+          clearInterval(timerId);
+        }
+      }, timeInterval);
+    }
   }
 
   puzzleIt(shiftTime) {
-    // проверка входных данных на валидность
-    this.shiftTimeLimited = shiftTime * 1000;
+    // чтобы нельзя было запустить второй раз такую функцию
+    if (this.isProcessRunning === false) {
+      // проверка входных данных на валидность
+      this.shiftTimeLimited = shiftTime * 1000;
 
-    if (shiftTime < 1) {
-      this.shiftTimeLimited = 1000;
-    }
-    if (shiftTime > 20) {
-      this.shiftTimeLimited = 20000;
-    }
+      if (shiftTime < 1) {
+        this.shiftTimeLimited = 1000;
+      }
+      if (shiftTime > 20) {
+        this.shiftTimeLimited = 20000;
+      }
 
-    this.isProcessRun = true;
-    this.shiftCells(this.shiftTimeLimited);
-    this.processTimer = setInterval(
-      this.shiftCells.bind(this, this.shiftTimeLimited),
-      this.shiftTimeLimited,
-    );
+      this.isProcessRunning = true;
+      this.shiftCells(this.shiftTimeLimited);
+      this.processTimer = setInterval(
+        this.shiftCells.bind(this, this.shiftTimeLimited),
+        this.shiftTimeLimited,
+      );
+    }
   }
 
   stop() {
-    clearInterval(this.processTimer);
-    this.processTimer = 0;
-    this.isProcessRun = false;
+    if (this.isProcessRunning === true) {
+      clearInterval(this.processTimer);
+      this.processTimer = 0;
+      this.isProcessRunning = false;
+    }
   }
 
   reset() {
     let wasProcessRunning = false;
     // вначале нужно убить внешний цикл
-    if (this.isProcessRun === true) {
+    if (this.isProcessRunning === true) {
       wasProcessRunning = true;
       this.stop();
     }
