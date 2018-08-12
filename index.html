@@ -49,13 +49,15 @@
 
     const startBtn = document.querySelector('#start');
     startBtn.addEventListener('click', () => {
-      puzzle.puzzleIt(3);
+      
       btnText = startBtn.textContent.trim(); 
       if (btnText === 'Start!') {
         startBtn.textContent = 'Stop';
+        puzzle.puzzleIt(3);
       }
       else {
         startBtn.textContent = 'Start!';
+        puzzle.stop();
       }
     });
     
